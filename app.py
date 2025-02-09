@@ -174,11 +174,11 @@ def comprovante(payment_id):
             return "Dados não encontrados", 404
         
         # Converter a data de string para datetime
-        data_pagamento = datetime.strptime(receipt_data[0], '%d/%m/%Y %H:%M:%S')  # Formato correto
+        #data_pagamento = datetime.strptime(receipt_data[0], '%d/%m/%Y %H:%M')  # Formato correto
 
         # Estruturar os dados do comprovante
         receipt_data_dict = { 
-            'data': data_pagamento.strftime('%d/%m/%Y %H:%M'),  # Formatar data
+            'data': receipt_data[0],  # Formatar data
             'evento': receipt_data[1],
             'endereco': receipt_data[2],
             'dataevento': receipt_data[3],
@@ -194,8 +194,11 @@ def comprovante(payment_id):
         app.logger.info("Dados da Inscrição:")
         app.logger.info(receipt_data)
 
-        flmail = receipt_data['FLMAIL']
-        id_inscricao = receipt_data['IDINSCRICAO']
+        flmail = receipt_data[10]
+        id_inscricao = receipt_data[11]
+        app.logger.info(f' FLMAIL: { flmail }')
+        app.logger.info(f' ID INSC: { id_inscricao }')
+
 
         if flmail == 'N':
 
@@ -220,7 +223,7 @@ def comprovante(payment_id):
     except Exception as e:
         app.logger.error(f"Erro ao buscar dados do comprovante: {str(e)}")
         return "Erro ao buscar dados", 500
-        
+
 @app.route('/vercomprovante/<int:payment_id>')
 def vercomprovante(payment_id):
     try:
@@ -234,7 +237,7 @@ def vercomprovante(payment_id):
                 CONCAT(E.DTINICIO,' ',E.HRINICIO,' - ',E.DTFIM) as DTEVENTO,
                 CONCAT(A.NOME,' ',A.SOBRENOME) as NOME_COMPLETO, 
                 CONCAT(M.DISTANCIA,' / ',M.DESCRICAO) AS DISTANCIA,
-                I.VALOR, I.VALOR_PGTO, I.FORMAPGTO, I.IDPAGAMENTO
+                I.VALOR, I.VALOR_PGTO, I.FORMAPGTO, I.IDPAGAMENTO, I.FLMAIL, I.IDINSCRICAO
             FROM ecmrun.INSCRICAO_TT I, ecmrun.ATLETA_TT A, 
             ecmrun.EVENTO E, ecmrun.EVENTO_MODALIDADE M
             WHERE M.IDITEM = I.IDITEM
@@ -251,11 +254,16 @@ def vercomprovante(payment_id):
             return "Dados não encontrados", 404
         
         # Converter a data de string para datetime
-        data_pagamento = datetime.strptime(receipt_data[0], '%d/%m/%Y %H:%M:%S')  # Formato correto
+        #data_pagamento = datetime.strptime(receipt_data[0], '%d/%m/%Y %H:%M:%S')  # Formato correto
+
+        flmail = receipt_data[10]
+        id_inscricao = receipt_data[11]
+        app.logger.info(f' FLMAIL: { flmail }')
+        app.logger.info(f' ID INSC: { id_inscricao }')
 
         # Estruturar os dados do comprovante
         receipt_data_dict = { 
-            'data': data_pagamento.strftime('%d/%m/%Y %H:%M'),  # Formatar data
+            'data': receipt_data[0],  # Formatar data
             'evento': receipt_data[1],
             'endereco': receipt_data[2],
             'dataevento': receipt_data[3],
@@ -276,7 +284,6 @@ def vercomprovante(payment_id):
     except Exception as e:
         app.logger.error(f"Erro ao buscar dados do comprovante: {str(e)}")
         return "Erro ao buscar dados", 500
-
 
 @app.route('/comprovanteemail/<int:payment_id>')
 def comprovanteemail(payment_id):
@@ -307,13 +314,9 @@ def comprovanteemail(payment_id):
             app.logger.info("Dados não encontrados")
             return "Dados não encontrados", 404
         
-
-        # Converter a data de string para datetime
-        data_pagamento = datetime.strptime(receipt_data[0], '%d/%m/%Y %H:%M:%S')  # Formato correto
-
         # Estruturar os dados do comprovante
         receipt_data_dict = { 
-            'data': data_pagamento.strftime('%d/%m/%Y %H:%M'),  # Formatar data
+            'data': receipt_data[0],  # Formatar data
             'evento': receipt_data[1],
             'endereco': receipt_data[2],
             'dataevento': receipt_data[3],
